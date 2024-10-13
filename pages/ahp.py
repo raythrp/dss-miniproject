@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-<<<<<<< HEAD
 # Fungsi untuk menghitung bobot prioritas AHP tanpa menggunakan vektor
 def ahp_priority(matrix):
     n = len(matrix)
@@ -16,9 +15,6 @@ def ahp_priority(matrix):
     lambda_max = sum(weighted_sum_vector[i] / priorities[i] for i in range(n)) / n
     
     return priorities, lambda_max
-=======
-from streamlit_app import *
->>>>>>> 18e122713491c7e728bf90c2db8929e3c6639e2f
 
 # Fungsi untuk menghitung rasio konsistensi
 def consistency_ratio(matrix, priorities):
@@ -27,18 +23,18 @@ def consistency_ratio(matrix, priorities):
     lambda_max = sum(weighted_sum_vector[i] / priorities[i] for i in range(n)) / n
     ci = (lambda_max - n) / (n - 1)  # Menghitung Consistency Index
     random_index = {1: 0.00, 2: 0.00, 3: 0.58, 4: 0.90, 5: 1.12, 6: 1.24, 7: 1.32, 8: 1.41, 9: 1.45, 10: 1.49}
-    cr = ci / random_index[n]  # Menghitung Consistency Ratio
+    cr = ci / random_index[n] if n > 1 else 0  # Menghitung Consistency Ratio, pastikan tidak membagi dengan nol
     return cr, lambda_max  # Mengembalikan CR dan lambda_max
 
 st.title("Metode AHP dengan Input Manual")
 
 # Input kriteria
 st.header("Masukkan Kriteria")
-num_criteria = st.number_input("Jumlah Kriteria", min_value=1, max_value=10, value=5)
+num_criteria = st.number_input("Jumlah Kriteria", min_value=1, max_value=10, value=3)
 
 criteria = []
 for i in range(num_criteria):
-    criteria.append(st.text_input(f"Nama Kriteria {i+1}", value=f"C0{i+1}"))
+    criteria.append(st.text_input(f"Nama Kriteria {i+1}", value=f"Kriteria {i+1}"))
 
 # Matriks Perbandingan Berpasangan
 st.header("Masukkan Matriks Perbandingan Berpasangan Kriteria")
@@ -108,13 +104,16 @@ for k in criteria:
 if st.button("Hitung Alternatif Terbaik"):
     final_scores = [0] * num_alternatives  # Inisialisasi dengan nol
 
-    # Pastikan kita mengalikan dengan bobot kriteria yang sesuai
-    for i in range(num_criteria):
-        for j in range(num_alternatives):
-            final_scores[j] += all_alt_weights[i][j] * priorities[i]  # Mengalikan bobot prioritas alternatif dengan bobot kriteria
+    # Menghitung skor akhir untuk setiap alternatif
+    for j in range(num_alternatives):
+        # Skor akhir dihitung dengan menjumlahkan semua bobot prioritas alternatif untuk setiap kriteria
+        # dikalikan dengan bobot prioritas kriteria masing-masing
+        final_scores[j] = sum(all_alt_weights[i][j] * priorities[i] for i in range(num_criteria))
 
     st.subheader("Skor Akhir untuk Setiap Alternatif:")
     final_df = pd.DataFrame(final_scores, index=alternatives, columns=["Skor Akhir"])
+    final_df['Ranking'] = final_df['Skor Akhir'].rank(ascending=False, method='min').astype(int)
     st.write(final_df)
 
-    st.write(f"Alternatif terbaik adalah: {alternatives[final_scores.index(max(final_scores))]}")
+    best_alternative = final_df['Skor Akhir'].idxmax()
+    st.write(f"Alternatif terbaik adalah: {best_alternative}")
