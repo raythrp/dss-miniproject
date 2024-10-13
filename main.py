@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from pages.wp import wp_page  # Sesuaikan sesuai path
 
+
 st.set_page_config(page_title="Decision Support System", layout="wide")
 
 st.title("Decision Support System")

@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 
+<<<<<<< HEAD
 # Fungsi untuk menghitung bobot prioritas AHP tanpa menggunakan vektor
 def ahp_priority(matrix):
     n = len(matrix)
@@ -15,6 +16,9 @@ def ahp_priority(matrix):
     lambda_max = sum(weighted_sum_vector[i] / priorities[i] for i in range(n)) / n
     
     return priorities, lambda_max
+=======
+from streamlit_app import *
+>>>>>>> 18e122713491c7e728bf90c2db8929e3c6639e2f
 
 # Fungsi untuk menghitung rasio konsistensi
 def consistency_ratio(matrix, priorities):
