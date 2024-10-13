@@ -125,5 +125,5 @@ def wp_page():
         best_score = np.max(V)
         st.success(f"The best alternative is {best_alternative} with a score of {best_score:.4f}")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     wp_page()

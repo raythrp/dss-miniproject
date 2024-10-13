@@ -170,5 +170,5 @@ def ahp_page():
 
         st.success(f"The best alternative is {final_df.iloc[0]['Alternative']} with a score of {final_df.iloc[0]['Score']:.4f}")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     ahp_page()
