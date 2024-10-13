@@ -71,54 +71,77 @@ def topsis(vendor_data, weights, is_benefit_criteria):
 
     return vendor_data
 
+# Inisialisasi session_state
+if 'vendor_data' not in st.session_state:
+    st.session_state.vendor_data = pd.DataFrame()
+if 'weights' not in st.session_state:
+    st.session_state.weights = []
+if 'is_benefit_criteria' not in st.session_state:
+    st.session_state.is_benefit_criteria = []
+if 'topsis_result' not in st.session_state:
+    st.session_state.topsis_result = pd.DataFrame()
+
 # Judul aplikasi
 st.title('Implementasi TOPSIS Manual dengan Streamlit')
 
+# Input di Sidebar
+st.sidebar.header("Input Data TOPSIS")
+
 # Input jumlah vendor dan kriteria
-num_vendors = st.number_input('Masukkan jumlah vendor', min_value=2, step=1)
-num_criteria = st.number_input('Masukkan jumlah kriteria', min_value=2, step=1)
+num_vendors = st.sidebar.number_input('Masukkan jumlah vendor', min_value=2, step=1)
+num_criteria = st.sidebar.number_input('Masukkan jumlah kriteria', min_value=2, step=1)
 
 # Input nama vendor
 vendors = []
 for i in range(num_vendors):
-    vendor = st.text_input(f'Nama Vendor {i+1}', f'Vendor {i+1}')
+    vendor = st.sidebar.text_input(f'Nama Vendor {i+1}', f'Vendor {i+1}')
     vendors.append(vendor)
 
 # Input nama kriteria
 criteria = []
 for j in range(num_criteria):
-    criterion = st.text_input(f'Nama Kriteria {j+1}', f'C{j+1}')
+    criterion = st.sidebar.text_input(f'Nama Kriteria {j+1}', f'C{j+1}')
     criteria.append(criterion)
 
 # Input bobot kriteria
 weights = []
-st.subheader('Masukkan bobot untuk masing-masing kriteria')
+st.sidebar.subheader('Masukkan bobot untuk masing-masing kriteria')
 for j in range(num_criteria):
-    weight = st.number_input(f'Bobot untuk {criteria[j]}', min_value=0.0, max_value=1.0, step=0.01)
+    weight = st.sidebar.number_input(f'Bobot untuk {criteria[j]}', min_value=0.0, max_value=1.0, step=0.01)
     weights.append(weight)
 
 # Tentukan apakah kriteria adalah benefit atau cost
 is_benefit_criteria = []
-st.subheader('Tentukan apakah kriteria ini benefit atau cost')
+st.sidebar.subheader('Tentukan apakah kriteria ini benefit atau cost')
 for j in range(num_criteria):
-    is_benefit = st.radio(f'{criteria[j]} adalah:', ['Benefit', 'Cost'], index=0)
+    is_benefit = st.sidebar.radio(f'{criteria[j]} adalah:', ['Benefit', 'Cost'], index=0)
     is_benefit_criteria.append(is_benefit == 'Benefit')
 
 # Input nilai tiap vendor pada setiap kriteria
 vendor_data = pd.DataFrame(index=vendors, columns=criteria)
 for i in range(num_vendors):
     for j in range(num_criteria):
-        score = st.number_input(f'Nilai {vendors[i]} untuk {criteria[j]}', min_value=0.0, step=0.1)
+        score = st.sidebar.number_input(f'Nilai {vendors[i]} untuk {criteria[j]}', min_value=0.0, step=0.1)
         vendor_data.loc[vendors[i], criteria[j]] = score
 
+# Simpan data ke session_state
+if st.sidebar.button('Simpan Data'):
+    st.session_state.vendor_data = vendor_data.astype(float)
+    st.session_state.weights = np.array(weights)
+    st.session_state.is_benefit_criteria = is_benefit_criteria
+    st.success("Data berhasil disimpan!")
+
 # Menjalankan TOPSIS jika data sudah lengkap
-if st.button('Hitung TOPSIS'):
-    # Konversi vendor_data ke tipe float
-    vendor_data = vendor_data.astype(float)
+if st.sidebar.button('Hitung TOPSIS') and not st.session_state.vendor_data.empty:
+    result = topsis(st.session_state.vendor_data.reset_index(), st.session_state.weights, st.session_state.is_benefit_criteria)
+    st.session_state.topsis_result = result  # Simpan hasil ke session_state
     
-    weights = np.array(weights)  # Konversi bobot ke numpy array
-    result = topsis(vendor_data.reset_index(), weights, is_benefit_criteria)
-    
-    # Menampilkan hasil perhitungan
+    # Menampilkan hasil perhitungan di halaman utama
     st.subheader('Hasil Ranking TOPSIS')
     st.write(result[['index', 'Closeness Coefficient', 'Ranking', 'Kesimpulan']].rename(columns={'index': 'Vendor'}))
+elif st.session_state.topsis_result is not None and not st.session_state.topsis_result.empty:
+    # Jika hasil sudah ada di session_state, tampilkan
+    st.subheader('Hasil Ranking TOPSIS')
+    st.write(st.session_state.topsis_result[['index', 'Closeness Coefficient', 'Ranking', 'Kesimpulan']].rename(columns={'index': 'Vendor'}))
+else:
+    st.info("Masukkan data dan simpan terlebih dahulu.")
