@@ -55,7 +55,7 @@ for i in range(num_criteria):
     weights.append(weight)
     total_weight += weight
 
-st.sidebar.warning("Please adjust weights until equals 1.")
+st.sidebar.info("Please adjust weights until equals 1.")
 
 # Input alternatives and their scores
 alternatives = []
