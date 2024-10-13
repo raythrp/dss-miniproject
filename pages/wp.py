@@ -4,9 +4,9 @@ import pandas as pd
 
 # Initialize WP-specific session state if it doesn't exist
 if 'wp_alternativesCount' not in st.session_state:
-    st.session_state.wp_alternativesCount = 1
+    st.session_state.wp_alternativesCount = 2
 if 'wp_criteriaCount' not in st.session_state:
-    st.session_state.wp_criteriaCount = 1
+    st.session_state.wp_criteriaCount = 2
 if 'wp_criteria_names' not in st.session_state:
     st.session_state.wp_criteria_names = ['Criteria 1', 'Criteria 2', 'Criteria 3', 'Criteria 4', 'Criteria 5']
 if 'wp_criteria_types' not in st.session_state:
@@ -27,7 +27,7 @@ def weight_product(criteria_weights, alternative_matrix, benefit_criteria):
 def wp_page():
     st.title("Weight Product Method")
     st.write("Thank you for choosing this method!")
-    st.markdown('Please fill in all of the input blocks in the sidebar.')
+    st.info('Please fill in all of the input blocks in the sidebar.')
 
     # Count inputs
     num_alternatives = st.session_state.wp_alternativesCount = st.sidebar.number_input("Number of Alternatives", min_value=2, max_value=10, value=st.session_state.wp_alternativesCount, key="wp_alt_count")
