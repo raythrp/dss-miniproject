@@ -115,7 +115,7 @@ st.write("Thank you for choosing this method!")
 st.markdown('Please fill in all of the input blocks and pay attention to the :orange[warnings!]')
 
 # Display results
-if st.sidebar.button("Calculate") and total_weight == 1:
+if st.sidebar.button("Calculate") and abs(total_weight - 1) <= 0.001:
     st.header("Result")
     result, chosen = saw_method(criteria_names, weights, st.session_state.scores, criteria_types)
     
@@ -123,6 +123,6 @@ if st.sidebar.button("Calculate") and total_weight == 1:
     st.write(result)
     
     st.success(f"The chosen alternative is {chosen}")
-elif total_weight != 1:
+elif abs(total_weight - 1) > 0.001:
     st.subheader(':orange[Warnings]')
     st.warning(f"Cannot calculate SAW results because the total weight is not 1, it's :orange[{total_weight}]")
